@@ -1,0 +1,90 @@
+<?php 
+
+
+/**
+ * Implements hook_permission().
+ */
+function guild_ranks_permission() {
+  return array(
+    'administer guild ranks' => array(
+      'title' => t('Administer guild ranks'),
+      'description' => t('Administer configuration of guild ranks relationships.')
+    )
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function guild_ranks_menu() {
+  $items['admin/config/guild/ranks'] = array(
+    'title' => 'Guild Ranks',
+    'description' => 'Configure guild ranks to relate to user permission roles',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('guild_ranks_admin_settings_form'),
+    'access arguments' => array('administer guild ranks'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'guild_ranks.admin.inc',
+  );
+
+  return $items;
+}
+
+
+function guild_ranks_get_field() {
+  //$ret = db_query('SELECT guild_ranks_field_watch FROM {guild_ranks_settings}')->fetchField();
+  //$ret = db_query('SELECT value FROM {variable} WHERE name = :name', array(':name' => 'guild_ranks_field'))->fetchField();
+  //return $ret ? check_plain ($ret) : '';
+  return variable_get('guild_ranks_field');
+}
+
+/*
+ * Alter user_presave to adjust roles based on taxonomy field
+ */
+function guild_ranks_user_presave(&$edit, &$account, $category = NULL) {
+	
+	//Skip this process unless we have a field set
+	$guild_ranks_field = guild_ranks_get_field();
+	if(empty($guild_ranks_field))
+		return null;
+
+
+	if(isset($edit[$guild_ranks_field]['und'][0]['tid'])) {
+		$edit_guild_rank = $edit[$guild_ranks_field]['und'][0]['tid'];
+		
+		if($edit_guild_rank != '_none') {
+			
+			//Populate current roles within system along with other module info
+			$super_admin = variable_get('guild_superadmin_role', '');
+			$drupal_roles = user_roles();
+			$role_relationship = variable_get('guild_rank_'.$edit_guild_rank, '');
+			
+			//References drupal roles to get role name
+			$role_name = $drupal_roles[$role_relationship];
+		
+			/*drupal_set_message('Roles:'.print_r($edit['roles']));
+			drupal_set_message('Guild Rank: ('.$edit_guild_rank.')');
+			drupal_set_message('Role Name: ('.$role_relationship.')'.$role_name);*/
+			
+			
+			//Just to make sure people know what happened
+			$guild_term = taxonomy_term_load($edit_guild_rank);
+			$guild_term_name = $guild_term->name;
+			drupal_set_message('User has been set to rank '.$guild_term_name.' and role of '.$role_name, 'warning');
+			
+			$new_roles_array = array(
+						  DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+	  					  $role_relationship => $role_name
+							);
+			
+			//What if we want to respect adding admin to a rank?
+			//TODO: Need settings to set what main admin role is
+			if(isset($edit['roles'][$super_admin]) && !empty($edit['roles'][$super_admin])) {
+				$new_roles_array[$super_admin] = $drupal_roles[$super_admin];
+			}
+
+			$edit['roles'] = $new_roles_array;
+		}
+	}
+}
+?>

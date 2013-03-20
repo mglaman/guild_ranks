@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the guild_ranks module.
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function guild_ranks_schema() {
+  $schema['guild_ranks_relationships'] = array(
+    'fields' => array(
+      'term_id' => array(
+        'type' => 'int',
+        'length' => 10,
+        'not null' => TRUE,
+        'description' => 'The term ID to set relationship with.',
+      ),
+      'role_id' => array(
+        'type' => 'int',
+        'length' => 10,
+        'not null' => TRUE,
+        'description' => "The role ID the term relates to",
+      ),
+    ),
+    'primary key' => array('term_id'),
+  );
+  $schema['guild_ranks_settings'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'int',
+        'length' => 10,
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'guild_ranks_enabled' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Whether the options are enabled or not',
+      ),
+      'guild_ranks_taxonomy' => array(
+        'type' => 'int',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'VID of the taxonomy to pull terms from',
+      ),
+      'guild_ranks_admin_role' => array(
+        'type' => 'int',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Role ID to set aside as super admin'
+      ),
+      'guild_ranks_field_watch' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'String field name to grab taxonomy reference from',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
+?>
