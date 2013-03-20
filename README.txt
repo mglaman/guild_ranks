@@ -6,6 +6,8 @@ This module allows you to select a taxonomy term reference field attached to use
 
 You can also define a super admin role that will not be overwritten. That way you can designate a user as an administrator of the site without changing that user's rank. The role of anonymous user has been removed from this selection. Shares same array as relationship area, need to make a separate array to remove that as well for security.
 
+Recommended use with field_permission for setting access to editing your rank taxonomy reference field.
+
 Not completely tested, but does work.
 
 =====
