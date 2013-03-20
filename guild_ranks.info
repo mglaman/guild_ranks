@@ -2,11 +2,8 @@ name = Guild Ranks
 description = Associates a profile field select list items with Drupal's permissions roles
 package = Drupal Guild
 core = 7.x
-;configure = admin/config/guild/rankings
-
-; Information added by drupal.org packaging script on 2013-02-23
+configure = admin/config/guild/ranks
 version = "7.x-0.1-beta"
 core = "7.x"
 project = "guild_ranks"
-datestamp = "1361648769"
 
